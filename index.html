@@ -66,7 +66,7 @@
 
   .alerta{display:flex;gap:10px;align-items:flex-start;background:hsl(0 84% 60% / .08);border:1px solid hsl(0 84% 60% / .35);color:hsl(0 90% 80%);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px}
 
-  .placar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .placar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
   .placar div.c{background:var(--gradient-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
   .placar .topo{display:flex;align-items:center;gap:8px;color:var(--muted-fg);font-weight:500}
   .placar .topo i{width:8px;height:8px;border-radius:50%;background:var(--cor)}
@@ -88,7 +88,7 @@
 
   .tabela{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
   table{width:100%;border-collapse:collapse}
-  @media (max-width:1000px){table{min-width:760px}}
+  @media (max-width:1000px){table{min-width:620px}}
   th,td{padding:12px 14px;text-align:left;white-space:nowrap;vertical-align:middle}
   th:first-child,td:first-child{padding-left:18px}
   th{font-size:12px;color:var(--muted-fg);font-weight:500;border-bottom:1px solid var(--border)}
@@ -105,7 +105,7 @@
   .aviso{color:var(--muted-fg);font-size:12px;margin-top:14px;max-width:80ch}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
   .toast.on{opacity:1}
-  @media (max-width:720px){.placar{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:720px){.placar{grid-template-columns:1fr}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -154,7 +154,7 @@
 
   <div class="tabela">
     <table>
-      <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th class="n">Contratos</th><th class="n">Pregões</th><th>Status</th></tr></thead>
+      <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Status</th></tr></thead>
       <tbody id="linhas"></tbody>
     </table>
   </div>
@@ -216,7 +216,6 @@ function render(){
 
   const cards = [
     { r:'Participantes', n:fmtN(todos.length), d:`${fmtN(d.contr_min)}+ contratos`, cor:'hsl(142 76% 45%)' },
-    { r:'Contratos', n:fmtN(d.total_contratos), d:'somados no período', cor:'hsl(187 92% 50%)' },
     { r:'Abaixo do mínimo', n:fmtN(d.abaixo_minimo), d:'operaram, mas não concorrem', cor:'hsl(215 20% 55%)' },
     { r:'Sorteados', n:String(ganhadores.length), d:'nesta sessão', cor:'hsl(45 93% 58%)' }
   ];
@@ -237,7 +236,7 @@ function render(){
   const lista = visiveis();
   if (!lista.length){
     const tr=document.createElement('tr'), td=document.createElement('td');
-    td.colSpan=7; td.className='vazio'; td.textContent = todos.length ? 'Ninguém encontrado na busca.' : 'Ninguém atingiu o mínimo no período.';
+    td.colSpan=5; td.className='vazio'; td.textContent = todos.length ? 'Ninguém encontrado na busca.' : 'Ninguém atingiu o mínimo no período.';
     tr.append(td); tb.append(tr);
   } else lista.forEach(c => {
     const tr = document.createElement('tr');
@@ -246,8 +245,6 @@ function render(){
     cel(nomeBonito(c.nome),'nome');
     cel(ocultar ? mascEmail(c.email) : c.email,'sub');
     cel(ocultar ? mascTel(c.telefone) : c.telefone,'m');
-    cel(fmtN(c.contratos),'m n');
-    cel(String(c.dias),'m n');
     const st = cel(''); const g = ganhadores.includes(c.sinacor);
     const s=document.createElement('span'); s.className='tag';
     s.style.setProperty('--c', g ? 'hsl(45 93% 58%)' : 'hsl(142 76% 45%)');
@@ -267,7 +264,7 @@ function palco(){
   if (!ult){ p.hidden = true; return; }
   p.hidden = false;
   $('pNome').textContent = nomeBonito(ult.nome);
-  $('pDet').textContent = `${fmtN(ult.contratos)} contratos · ${ult.dias} pregão(ões) · ${ocultar ? mascTel(ult.telefone) : (ult.telefone||'—')}`;
+  $('pDet').textContent = ocultar ? mascTel(ult.telefone) : (ult.telefone||'—');
   $('pHist').textContent = ganhadores.length > 1
     ? 'Antes: ' + ganhadores.slice(0,-1).map(s => nomeBonito((todos.find(x=>x.sinacor===s)||{}).nome)).join(' · ')
     : '';
@@ -294,8 +291,8 @@ function sortear(){
 
 function exportar(){
   const q = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
-  const rows = [['nome','telefone','email','contratos','pregoes','sorteado']].concat((dados.participantes||[]).map(p =>
-    [nomeBonito(p.nome), p.telefone, p.email, p.contratos, p.dias, ganhadores.includes(p.sinacor) ? 'sim' : '']));
+  const rows = [['nome','telefone','email','sorteado']].concat((dados.participantes||[]).map(p =>
+    [nomeBonito(p.nome), p.telefone, p.email, ganhadores.includes(p.sinacor) ? 'sim' : '']));
   const csv = '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
