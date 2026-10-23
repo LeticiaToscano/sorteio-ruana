@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Sorteio · Seja Livre</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎟️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:hsl(220 20% 4%); --fg:hsl(210 40% 98%);
+    --card:hsl(220 18% 8%); --muted:hsl(220 16% 14%); --muted-fg:hsl(215 20% 55%);
+    --border:hsl(220 16% 18%); --primary:hsl(187 92% 50%); --accent:hsl(45 93% 58%);
+    --success:hsl(142 76% 45%); --danger:hsl(0 84% 60%); --warning:hsl(38 92% 50%);
+    --radius:.75rem;
+    --gradient-primary:linear-gradient(135deg,hsl(187 92% 50%) 0%,hsl(210 100% 60%) 100%);
+    --gradient-card:linear-gradient(135deg,hsl(220 18% 10%) 0%,hsl(220 18% 6%) 100%);
+    --shadow-glow:0 0 60px -10px hsl(187 92% 50% / .3);
+    --shadow-card:0 25px 50px -12px hsl(0 0% 0% / .5);
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:radial-gradient(900px 420px at 80% -10%, hsl(187 92% 50% / .08), transparent 60%), var(--bg);
+    color:var(--fg); font-family:var(--sans); font-size:14px; line-height:1.5;
+    padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+    -webkit-font-smoothing:antialiased;
+  }
+  button,input{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+  .wrap{max-width:1320px;margin:0 auto;padding:24px 20px 56px}
+
+  .marca{display:flex;align-items:center;gap:10px;font-weight:600}
+  .marca i{width:10px;height:10px;border-radius:50%;background:var(--gradient-primary);box-shadow:0 0 12px hsl(187 92% 50% / .7)}
+  .marca span{color:var(--muted-fg);font-weight:500}
+
+  /* login */
+  #login{min-height:100vh;display:grid;place-items:center;padding:20px}
+  .porta{width:100%;max-width:380px;background:var(--gradient-card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-card), var(--shadow-glow)}
+  .porta h1{font-size:22px;letter-spacing:-.02em;margin:22px 0 4px}
+  .porta p{color:var(--muted-fg);margin:0 0 22px}
+  .porta input{width:100%;background:var(--muted);border:1px solid var(--border);border-radius:calc(var(--radius) - 4px);padding:11px 13px;margin-bottom:12px}
+  .btn{background:var(--gradient-primary);color:hsl(220 20% 4%);border:0;border-radius:calc(var(--radius) - 4px);padding:10px 16px;font-weight:600;cursor:pointer}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .porta .btn{width:100%}
+  .btn.sec{background:var(--muted);color:var(--fg);border:1px solid var(--border)}
+  .btn.sec:hover{border-color:hsl(187 92% 50% / .5)}
+  .erro{color:var(--danger);min-height:20px;margin-top:10px;font-size:13px}
+
+  /* painel */
+  header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+  .titulo{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .titulo h1{font-size:24px;letter-spacing:-.02em;margin:0}
+  .pill{font-family:var(--mono);font-size:12px;color:var(--muted-fg);background:var(--muted);border:1px solid var(--border);padding:4px 10px;border-radius:999px}
+
+  .pregoes{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .pregoes .pill.ok{color:hsl(215 20% 72%)}
+  .pregoes .pill.falta{color:var(--danger);border-color:hsl(0 84% 60% / .45);background:hsl(0 84% 60% / .08)}
+
+  .alerta{display:flex;gap:10px;align-items:flex-start;background:hsl(0 84% 60% / .08);border:1px solid hsl(0 84% 60% / .35);color:hsl(0 90% 80%);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px}
+
+  .placar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .placar div.c{background:var(--gradient-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .placar .topo{display:flex;align-items:center;gap:8px;color:var(--muted-fg);font-weight:500}
+  .placar .topo i{width:8px;height:8px;border-radius:50%;background:var(--cor)}
+  .placar .n{font-size:30px;font-weight:700;letter-spacing:-.03em;margin-top:6px;color:var(--fg)}
+  .placar .d{color:var(--muted-fg);font-size:12px}
+
+  /* sorteado */
+  .palco{background:var(--gradient-card);border:1px solid hsl(187 92% 50% / .5);border-radius:var(--radius);
+    padding:22px 24px;margin-bottom:24px;box-shadow:var(--shadow-card), var(--shadow-glow)}
+  .palco .topo{display:flex;align-items:center;gap:8px;color:var(--primary);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .palco .topo i{width:8px;height:8px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px hsl(187 92% 50% / .7)}
+  .palco .nome{font-size:clamp(24px,4vw,36px);font-weight:700;letter-spacing:-.03em;margin:8px 0 4px;word-break:break-word}
+  .palco .det{font-family:var(--mono);font-size:12.5px;color:hsl(215 20% 72%)}
+  .palco .hist{margin-top:14px;color:var(--muted-fg);font-size:12px}
+
+  .barra{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .barra input{flex:1;min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:calc(var(--radius) - 4px);padding:10px 12px}
+  .barra input::placeholder,.porta input::placeholder{color:var(--muted-fg)}
+
+  .tabela{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+  table{width:100%;border-collapse:collapse}
+  @media (max-width:1000px){table{min-width:760px}}
+  th,td{padding:12px 14px;text-align:left;white-space:nowrap;vertical-align:middle}
+  th:first-child,td:first-child{padding-left:18px}
+  th{font-size:12px;color:var(--muted-fg);font-weight:500;border-bottom:1px solid var(--border)}
+  th.n,td.n{text-align:right}
+  td{border-bottom:1px solid hsl(220 16% 12%)}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover td{background:hsl(220 16% 10%)}
+  td.nome{font-weight:500;white-space:normal;min-width:180px}
+  td.sub{white-space:normal;word-break:break-all;min-width:180px;color:var(--muted-fg)}
+  td.m{font-family:var(--mono);font-size:12.5px;color:hsl(215 20% 72%)}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;background:color-mix(in srgb, var(--c) 14%, transparent);color:var(--c)}
+  .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+  .vazio{padding:32px;color:var(--muted-fg);text-align:center}
+  .aviso{color:var(--muted-fg);font-size:12px;margin-top:14px;max-width:80ch}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.on{opacity:1}
+  @media (max-width:720px){.placar{grid-template-columns:repeat(2,1fr)}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section id="login" hidden>
+  <form class="porta" id="formLogin">
+    <div class="marca"><i></i>Seja Livre <span>· Sorteio</span></div>
+    <h1>Sorteio de clientes ativos</h1>
+    <p>Entre com a chave de acesso.</p>
+    <input type="password" id="senha" placeholder="Chave de acesso" autocomplete="off" spellcheck="false" required aria-label="Chave de acesso">
+    <button class="btn" type="submit">Entrar</button>
+    <div class="erro" id="erroLogin" role="alert"></div>
+  </form>
+</section>
+
+<main id="painel" class="wrap" hidden>
+  <header>
+    <div class="marca"><i></i>Seja Livre <span>· Sorteio</span></div>
+    <button class="btn sec" id="sair" type="button">Sair</button>
+  </header>
+
+  <div class="titulo">
+    <h1 id="tituloSorteio">Participantes do sorteio</h1>
+    <div class="pill" id="dataRef"></div>
+  </div>
+
+  <div class="pregoes" id="pregoes" aria-label="Pregões do período"></div>
+  <div class="alerta" id="alerta" role="alert" hidden></div>
+
+  <div class="placar" id="placar"></div>
+
+  <section class="palco" id="palco" aria-live="polite" hidden>
+    <div class="topo"><i></i>Sorteado</div>
+    <div class="nome" id="pNome"></div>
+    <div class="det" id="pDet"></div>
+    <div class="hist" id="pHist"></div>
+  </section>
+
+  <div class="barra">
+    <input type="search" id="busca" placeholder="Buscar por nome, e-mail ou telefone" aria-label="Buscar">
+    <button class="btn sec" id="bContatos" type="button">Mostrar contatos</button>
+    <button class="btn sec" id="bCsv" type="button">Exportar CSV</button>
+    <button class="btn" id="bSortear" type="button">Sortear</button>
+  </div>
+
+  <div class="tabela">
+    <table>
+      <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th class="n">Contratos</th><th class="n">Pregões</th><th>Status</th></tr></thead>
+      <tbody id="linhas"></tbody>
+    </table>
+  </div>
+  <p class="aviso" id="regra"></p>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+const SUPABASE_URL = 'https://hdgacffmwigdscrtctia.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8-g_Xdbxmb52CnPVhOpkBw_BmJk2M1a';
+const CHAVE_SESSAO = 'sorteio_parceiro_k';
+
+let dados = null, ocultar = true, ganhadores = [];
+const $ = id => document.getElementById(id);
+
+function br(iso){ if(!iso) return '—'; const [a,m,d] = String(iso).slice(0,10).split('-'); return `${d}/${m}/${a}`; }
+function dm(iso){ const [,m,d] = String(iso).split('-'); return `${d}/${m}`; }
+function nomeBonito(s){ return String(s||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(De|Da|Do|Dos|Das|E)\b/g,w=>w.toLowerCase()); }
+function fmtN(n){ return Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:0}); }
+function mascTel(t){ t=String(t||''); return t.length>4 ? t.slice(0,-4).replace(/\d/g,'•')+t.slice(-4) : t; }
+function mascEmail(e){ e=String(e||''); const i=e.indexOf('@'); return i>1 ? e[0]+'•••'+e.slice(i) : e; }
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),1800); }
+function ss(op,v){ try{ if(op==='get') return sessionStorage.getItem(CHAVE_SESSAO)||''; if(op==='set') sessionStorage.setItem(CHAVE_SESSAO,v); if(op==='del') sessionStorage.removeItem(CHAVE_SESSAO); }catch(e){} return ''; }
+
+/* a chave pode vir no link (#k=...) — o fragmento não vai para servidor nenhum; é guardada na sessão e some da barra */
+function lerChave(){
+  const m = location.hash.match(/(?:^#|&)k=([^&]+)/);
+  if (m){ const k = decodeURIComponent(m[1]); ss('set',k); try{ history.replaceState(null,'',location.pathname); }catch(e){} return k; }
+  return ss('get');
+}
+
+function visiveis(){
+  const q = $('busca').value.trim().toLowerCase();
+  return (dados.participantes||[]).filter(c => !q ||
+    [c.nome,c.email,c.telefone].some(v => String(v||'').toLowerCase().includes(q)));
+}
+
+function render(){
+  const d = dados, todos = d.participantes||[], faltam = d.pregoes_faltando||[];
+  const parceiro = d.parceiro || '';
+  $('tituloSorteio').textContent = parceiro ? `Sorteio ${parceiro}` : 'Participantes do sorteio';
+  document.title = (parceiro ? `Sorteio ${parceiro}` : 'Sorteio') + ' · Seja Livre';
+  $('dataRef').textContent = `${br(d.de)} a ${br(d.ate)}`;
+
+  const pr = $('pregoes'); pr.textContent = '';
+  (d.pregoes_lista||[]).forEach(iso => {
+    const s = document.createElement('span'); const f = faltam.includes(iso);
+    s.className = 'pill ' + (f ? 'falta' : 'ok'); s.textContent = dm(iso) + (f ? ' · sem dados' : '');
+    pr.append(s);
+  });
+
+  const al = $('alerta');
+  if (faltam.length){
+    al.hidden = false;
+    al.textContent = `Faltam ${faltam.length} pregão(ões) na base (${faltam.map(dm).join(', ')}). A lista pode estar incompleta — espere a atualização antes de sortear.`;
+  } else al.hidden = true;
+
+  const cards = [
+    { r:'Participantes', n:fmtN(todos.length), d:`${fmtN(d.contr_min)}+ contratos`, cor:'hsl(142 76% 45%)' },
+    { r:'Contratos', n:fmtN(d.total_contratos), d:'somados no período', cor:'hsl(187 92% 50%)' },
+    { r:'Abaixo do mínimo', n:fmtN(d.abaixo_minimo), d:'operaram, mas não concorrem', cor:'hsl(215 20% 55%)' },
+    { r:'Sorteados', n:String(ganhadores.length), d:'nesta sessão', cor:'hsl(45 93% 58%)' }
+  ];
+  const pl = $('placar'); pl.textContent = '';
+  cards.forEach(a => {
+    const c = document.createElement('div'); c.className='c'; c.style.setProperty('--cor', a.cor);
+    const t = document.createElement('div'); t.className='topo'; t.append(document.createElement('i'), a.r);
+    const n = document.createElement('div'); n.className='n'; n.textContent=a.n;
+    const s = document.createElement('div'); s.className='d'; s.textContent=a.d;
+    c.append(t,n,s); pl.append(c);
+  });
+
+  $('bContatos').textContent = ocultar ? 'Mostrar contatos' : 'Ocultar contatos';
+  $('bSortear').disabled = !todos.length;
+  $('bCsv').disabled = !todos.length;
+
+  const tb = $('linhas'); tb.textContent = '';
+  const lista = visiveis();
+  if (!lista.length){
+    const tr=document.createElement('tr'), td=document.createElement('td');
+    td.colSpan=7; td.className='vazio'; td.textContent = todos.length ? 'Ninguém encontrado na busca.' : 'Ninguém atingiu o mínimo no período.';
+    tr.append(td); tb.append(tr);
+  } else lista.forEach(c => {
+    const tr = document.createElement('tr');
+    const cel = (txt, cls) => { const td=document.createElement('td'); if(cls) td.className=cls; td.textContent = txt || '—'; tr.append(td); return td; };
+    cel(String(todos.indexOf(c)+1),'m');
+    cel(nomeBonito(c.nome),'nome');
+    cel(ocultar ? mascEmail(c.email) : c.email,'sub');
+    cel(ocultar ? mascTel(c.telefone) : c.telefone,'m');
+    cel(fmtN(c.contratos),'m n');
+    cel(String(c.dias),'m n');
+    const st = cel(''); const g = ganhadores.includes(c.sinacor);
+    const s=document.createElement('span'); s.className='tag';
+    s.style.setProperty('--c', g ? 'hsl(45 93% 58%)' : 'hsl(142 76% 45%)');
+    s.textContent = g ? 'Sorteado' : 'Concorrendo'; st.textContent=''; st.append(s);
+    tb.append(tr);
+  });
+
+  $('regra').textContent = `Concorre quem operou no mínimo ${fmtN(d.contr_min)} contratos de futuro (BMF) nos últimos ${d.pregoes} pregões. Uma chance por cliente (contas no mesmo CPF contam uma vez). As operações entram no sistema no dia útil seguinte ao pregão.`;
+  palco();
+}
+
+function palco(){
+  const p = $('palco');
+  if (!ganhadores.length){ p.hidden = true; return; }
+  const todos = dados.participantes||[];
+  const ult = todos.find(x => x.sinacor === ganhadores[ganhadores.length-1]);
+  if (!ult){ p.hidden = true; return; }
+  p.hidden = false;
+  $('pNome').textContent = nomeBonito(ult.nome);
+  $('pDet').textContent = `${fmtN(ult.contratos)} contratos · ${ult.dias} pregão(ões) · ${ocultar ? mascTel(ult.telefone) : (ult.telefone||'—')}`;
+  $('pHist').textContent = ganhadores.length > 1
+    ? 'Antes: ' + ganhadores.slice(0,-1).map(s => nomeBonito((todos.find(x=>x.sinacor===s)||{}).nome)).join(' · ')
+    : '';
+}
+
+function aleatorio(n){ const a=new Uint32Array(1), lim=Math.floor(4294967296/n)*n; do{ crypto.getRandomValues(a); }while(a[0]>=lim); return a[0]%n; }
+
+function sortear(){
+  const pote = (dados.participantes||[]).filter(p => !ganhadores.includes(p.sinacor));
+  if (!pote.length){ toast('Todos já foram sorteados'); return; }
+  if ((dados.pregoes_faltando||[]).length && !confirm('Ainda faltam pregões na base. Sortear mesmo assim?')) return;
+  const escolhido = pote[aleatorio(pote.length)];
+  const reduzir = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const b = $('bSortear'); b.disabled = true;
+  const p = $('palco'); p.hidden = false; $('pDet').textContent=''; $('pHist').textContent='';
+  let i = 0; const passos = reduzir ? 0 : 26;
+  (function giro(){
+    if (i < passos){ $('pNome').textContent = nomeBonito(pote[aleatorio(pote.length)].nome); i++; setTimeout(giro, 40 + i*6); return; }
+    ganhadores.push(escolhido.sinacor);
+    render(); b.disabled = false;
+    p.scrollIntoView({behavior: reduzir ? 'auto' : 'smooth', block:'center'});
+  })();
+}
+
+function exportar(){
+  const q = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
+  const rows = [['nome','telefone','email','contratos','pregoes','sorteado']].concat((dados.participantes||[]).map(p =>
+    [nomeBonito(p.nome), p.telefone, p.email, p.contratos, p.dias, ganhadores.includes(p.sinacor) ? 'sim' : '']));
+  const csv = '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download = `sorteio_${(dados.parceiro||'parceiro').toLowerCase()}_${dados.de}_a_${dados.ate}.csv`;
+  document.body.append(a); a.click(); a.remove();
+}
+
+async function carregar(k){
+  if (!k){ mostrarLogin(); return; }
+  const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/sorteio_parceiro', {
+    method:'POST', headers:{ 'apikey':SUPABASE_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify({ p_token:k })
+  });
+  const d = await r.json().catch(() => null);
+  if (!r.ok || !d || d.erro){ ss('del'); mostrarLogin(d && d.erro ? 'Chave inválida ou acesso desativado' : 'Erro ao carregar'); return; }
+  dados = d; ganhadores = [];
+  $('login').hidden = true; $('painel').hidden = false;
+  render();
+}
+
+function mostrarLogin(msg){
+  $('painel').hidden = true; $('login').hidden = false;
+  $('erroLogin').textContent = msg || '';
+  $('senha').focus();
+}
+
+$('formLogin').onsubmit = e => {
+  e.preventDefault();
+  const k = $('senha').value.trim(); $('senha').value = '';
+  $('erroLogin').textContent = '';
+  ss('set', k);
+  carregar(k).catch(() => mostrarLogin('Sem conexão'));
+};
+$('sair').onclick = () => { ss('del'); dados = null; ganhadores = []; mostrarLogin(); };
+$('busca').oninput = render;
+$('bContatos').onclick = () => { ocultar = !ocultar; render(); };
+$('bCsv').onclick = exportar;
+$('bSortear').onclick = sortear;
+
+carregar(lerChave()).catch(() => mostrarLogin('Sem conexão'));
+})();
+</script>
+</body>
+</html>
